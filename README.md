@@ -1,4 +1,4 @@
-This Project is a controller for a node server that acts as a hub to a HiFi-Marantz receiver.
+This project is a controller for a node server that acts as a hub to a HiFi-Marantz receiver.
 
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
