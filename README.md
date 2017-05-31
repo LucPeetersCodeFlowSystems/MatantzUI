@@ -4,7 +4,7 @@ This project is a controller for a Raspberry Pi nodejs server that acts as a hub
 
 - The MarantzUI sends commands to the nodejs server by using the MQTT protocol.
 - The nodejs server listens to the /marantz/cmd queue and writes the command and value to the serial port.
-- The serial port is connected a rs232 interface.
+- The serial port is connected to a rs232 interface.
 - The rs232 is connected to a Marantz receiver.
 
 
