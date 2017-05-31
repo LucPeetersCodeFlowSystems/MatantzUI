@@ -135,8 +135,8 @@ class App extends Component {
   }
 
   onPOWER() {
-    client.publish('marantz/cmd/PWR', (this.state.PWR ? "0" : "2"));
-    client.publish('marantz/cmd/MSP', (this.state.PWR ? "0" : "2"));
+    client.publish('marantz/cmd/PWR', (this.state.PWR ? "0" : "1"));
+    client.publish('marantz/cmd/MSP', (this.state.PWR ? "0" : "1"));
   }
   onRADIO() {
     client.publish('marantz/cmd/PWR', "2");
