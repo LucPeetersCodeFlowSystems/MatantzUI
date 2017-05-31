@@ -16,10 +16,6 @@ import Divider from 'material-ui/Divider';
 import Checkbox from 'material-ui/Checkbox';
 import Spinner from 'react-spinkit';
 
-// import FontIcon from 'material-ui/FontIcon';
-// import MapsPersonPin from 'material-ui/svg-icons/maps/person-pin';
-// import ToolbarExamplesSimple from './ToolbarExamplesSimple';
-// import CardExampleWithAvatar from './CardExampleWithAvatar';
 
 var mqtt = require('mqtt');
 var host = 'ws://' + '192.168.0.194' + ':9001';
