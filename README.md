@@ -1,4 +1,12 @@
-This project is a controller for a node server that acts as a hub to a HiFi-Marantz receiver.
+## Introduction
+
+This project is a controller for a Raspberry Pi nodejs server that acts as a hub to a HiFi-Marantz receiver.
+
+The MarantzUI sends commands to the nodejs server by using the MQTT protocol
+The node server listens to the /marantz/cmd queue and write the command and value to the serial port
+The serial port is connected a rs232 interface
+The rs232 is connected to a Marantz receiver
+
 
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
