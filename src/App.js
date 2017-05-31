@@ -195,7 +195,7 @@ class App extends Component {
         <div style={{color:'gray'}}>
           <br />
           <h3>
-          <div>Controleer als de Marantz versterker aan staat</div>
+          <div>Controleer als de Marantz versterker aan staat.</div>
           </h3>
         </div>
       </div>
