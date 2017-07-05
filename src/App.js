@@ -17,7 +17,7 @@ import Checkbox from 'material-ui/Checkbox';
 import Spinner from 'react-spinkit';
 
 var mqtt = require('mqtt');
-var host = 'ws://' + '192.168.0.146' + ':9001';
+var host = 'ws://' + 'marantz-pi.local' + ':9001';
 var mqtt_client;
 
 injectTapEventPlugin();
