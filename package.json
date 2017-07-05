@@ -18,7 +18,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "copy": "xcopy build \\\\pi\\homes\\Projects\\rs232\\react\\my-app\\build /Y /E",
+    "copy": "xcopy build \\\\marantz-pi\\pi\\Projects\\rs232\\server\\build /Y /E",
     "deploy": "npm run build --production && npm run copy"
   }
 }

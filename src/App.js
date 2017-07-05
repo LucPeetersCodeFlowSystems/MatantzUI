@@ -16,41 +16,49 @@ import Divider from 'material-ui/Divider';
 import Checkbox from 'material-ui/Checkbox';
 import Spinner from 'react-spinkit';
 
-
 var mqtt = require('mqtt');
-var host = 'ws://' + '192.168.0.194' + ':9001';
-var client = mqtt.connect(host);
-
-console.log("connecting..");
-client.on('connect', function () {
-  console.log("connected");
-  client.subscribe("marantz/cmd/+");
-  client.subscribe("marantz/rcv/+");
-});
-
+var host = 'ws://' + '192.168.0.146' + ':9001';
+var mqtt_client;
 
 injectTapEventPlugin();
 
 class App extends Component {
 
-  Source = { "1": "TV", "11": "TV", "2": "DVD", "D": "SONOS", "1D": "SONOS", "1G": "FM RADIO", "G": "FM RADIO" };
+  Source = { "1": "TV", "11": "TV", "2": "DVD", "D": "SONOS", "1D": "SONOS", "5G": "FM RADIO", "G": "FM RADIO", "55": "APPLE-MUSIC" };
+  timer = null;
 
   constructor(props) {
     super(props);
 
-    client.on('message', this.onMessage.bind(this));
-
     this.state = { ininit: true, PWR: false, MSP: false, MainVolume: undefined, SRC: "none", MSC: "none", RoomVolume: undefined };
 
-    client.publish('marantz/cmd/PWR', "?");
+    mqtt_client = mqtt.connect(host);
+    mqtt_client.on('message', this.onMessage.bind(this));
+    mqtt_client.on('connect', this.onConnect.bind(this));
+  }
 
-    client.publish('marantz/cmd/VOL', "?");
-    client.publish('marantz/cmd/SRC', "?");
+  onConnect() {
+    mqtt_client.subscribe("marantz/cmd/+");
+    mqtt_client.subscribe("marantz/rcv/+");
 
-    client.publish('marantz/cmd/MSP', "?");
-    client.publish('marantz/cmd/MSV', "?");
-    client.publish('marantz/cmd/MSC', "?");
+    this.initialRequest();
+    //this.timer = window.setTimeout(this.onTimeout.bind(this), 2000);
+  }
 
+  initialRequest() {
+    mqtt_client.publish('marantz/cmd/PWR', "?");
+
+    mqtt_client.publish('marantz/cmd/VOL', "?");
+    mqtt_client.publish('marantz/cmd/SRC', "?");
+
+    mqtt_client.publish('marantz/cmd/MSP', "?");
+    mqtt_client.publish('marantz/cmd/MSV', "?");
+    mqtt_client.publish('marantz/cmd/MSC', "?");
+  }
+
+  onTimeout() {
+    //this.initialRequest();
+    //this.timer = window.setTimeout(this.onTimeout.bind(this), 2000);
   }
 
   onMessage(topic, payload, packet) {
@@ -59,6 +67,7 @@ class App extends Component {
 
       if (topic == "marantz/rcv/PWR") {
         if (this.state.ininit) {
+          //window.clearTimeout(this.timer);
           this.setState({ ininit: false });
         }
       }
@@ -90,89 +99,93 @@ class App extends Component {
   }
 
   PWR(object, isInputChecked) {
-    client.publish('marantz/cmd/PWR', (isInputChecked ? "2" : "0"));
+    mqtt_client.publish('marantz/cmd/PWR', (isInputChecked ? "2" : "0"));
   }
 
   MSP(object, isInputChecked) {
-    client.publish('marantz/cmd/MSP', (isInputChecked ? "2" : "0"));
+    mqtt_client.publish('marantz/cmd/MSP', (isInputChecked ? "2" : "0"));
   }
 
   volumeChange(event, newValue) {
-    client.publish('marantz/cmd/VOL', "0" + newValue);
+    mqtt_client.publish('marantz/cmd/VOL', "0" + newValue);
     console.log("volumeChange", newValue);
 
     this.setState({ MainVolume: newValue });
   }
-  
-  onMainVolume(delta)
-  {
+
+  onMainVolume(delta) {
     const newVolume = this.state.MainVolume + delta;
 
     console.log(newVolume);
 
     if (newVolume > -10) return
-    client.publish('marantz/cmd/VOL', "0" +  newVolume);
+    mqtt_client.publish('marantz/cmd/VOL', "0" + newVolume);
   }
 
-  onRoomVolume(delta)
-  {
+  onRoomVolume(delta) {
     const newVolume = this.state.RoomVolume + delta;
 
     console.log(newVolume);
 
     if (newVolume > -10) return
-    client.publish('marantz/cmd/MSV', "0" +  newVolume);
+    mqtt_client.publish('marantz/cmd/MSV', "0" + newVolume);
   }
 
   RoomVolumeChange(event, newValue) {
-    client.publish('marantz/cmd/MSV', "0" + newValue);
+    mqtt_client.publish('marantz/cmd/MSV', "0" + newValue);
 
     this.setState({ RoomVolume: newValue });
   }
 
   onPOWER() {
-    client.publish('marantz/cmd/PWR', (this.state.PWR ? "0" : "2"));
-    client.publish('marantz/cmd/MSP', (this.state.PWR ? "0" : "2"));
+    mqtt_client.publish('marantz/cmd/PWR', (this.state.PWR ? "0" : "2"));
+    mqtt_client.publish('marantz/cmd/MSP', (this.state.PWR ? "0" : "2"));
   }
   onRADIO() {
-    client.publish('marantz/cmd/PWR', "2");
-    client.publish('marantz/cmd/SRC', "G");
-    client.publish('marantz/cmd/VOL', "0-45");
-    client.publish('marantz/cmd/MSP', "2");
-    client.publish('marantz/cmd/MSC', "G");
-    client.publish('marantz/cmd/MSV', "0-78");
+    mqtt_client.publish('marantz/cmd/PWR', "2");
+    mqtt_client.publish('marantz/cmd/SRC', "G");
+    mqtt_client.publish('marantz/cmd/VOL', "0-45");
+    mqtt_client.publish('marantz/cmd/MSP', "2");
+    mqtt_client.publish('marantz/cmd/MSC', "G");
+    mqtt_client.publish('marantz/cmd/MSV', "0-78");
   }
   onTV() {
-    client.publish('marantz/cmd/PWR', "2");
-    client.publish('marantz/cmd/SRC', "1");
-    client.publish('marantz/cmd/VOL', "0-25");
-    client.publish('marantz/cmd/MSC', "1");
-    client.publish('marantz/cmd/MSV', "0-90");
-    client.publish('marantz/cmd/MSP', "1");
+    mqtt_client.publish('marantz/cmd/PWR', "2");
+    mqtt_client.publish('marantz/cmd/SRC', "1");
+    mqtt_client.publish('marantz/cmd/VOL', "0-25");
+    mqtt_client.publish('marantz/cmd/MSC', "1");
+    mqtt_client.publish('marantz/cmd/MSV', "0-90");
+    mqtt_client.publish('marantz/cmd/MSP', "1");
   }
   onSONOS() {
-    client.publish('marantz/cmd/PWR', "2");
-    client.publish('marantz/cmd/SRC', "D");
-    client.publish('marantz/cmd/VOL', "0-40");
-    client.publish('marantz/cmd/MSP', "2");
-    client.publish('marantz/cmd/MSC', "D");
-    client.publish('marantz/cmd/MSV', "0-75");
-
+    mqtt_client.publish('marantz/cmd/PWR', "2");
+    mqtt_client.publish('marantz/cmd/SRC', "D");
+    mqtt_client.publish('marantz/cmd/VOL', "0-40");
+    mqtt_client.publish('marantz/cmd/MSP', "2");
+    mqtt_client.publish('marantz/cmd/MSC', "D");
+    mqtt_client.publish('marantz/cmd/MSV', "0-75");
+  }
+  onDSS() {
+    mqtt_client.publish('marantz/cmd/PWR', "2");
+    mqtt_client.publish('marantz/cmd/SRC', "5");
+    mqtt_client.publish('marantz/cmd/VOL', "0-33");
+    mqtt_client.publish('marantz/cmd/MSP', "2");
+    mqtt_client.publish('marantz/cmd/MSC', "5");
+    mqtt_client.publish('marantz/cmd/MSV', "0-75");
   }
 
   onLIVING() {
-    client.publish('marantz/cmd/PWR', "0");
-    client.publish('marantz/cmd/VOL', "0-45");
+    mqtt_client.publish('marantz/cmd/PWR', "0");
+    mqtt_client.publish('marantz/cmd/VOL', "0-45");
   }
 
   onKEUKEN() {
-    client.publish('marantz/cmd/MSP', "0");
-    client.publish('marantz/cmd/MSV', "0-78");
+    mqtt_client.publish('marantz/cmd/MSP', "0");
+    mqtt_client.publish('marantz/cmd/MSV', "0-78");
   }
 
 
-  areSources(state)
-  {
+  areSources(state) {
     let mainSource = this.Source[this.state.SRC];
     let subSource = this.Source[this.state.MSC];
 
@@ -185,13 +198,13 @@ class App extends Component {
   render() {
     if (this.state.ininit) return (
       <div style={{ width: '100%', height: '100%', textAlign: 'center', verticalAlign: 'middle', marginTop: 200 }} >
-        <div style={{display: 'inline-block'}}>
-            <Spinner style={{height: 120, width: 120, color: 'white'}} spinnerName="circle" />
+        <div style={{ display: 'inline-block' }}>
+          <Spinner style={{ height: 120, width: 120, color: 'white' }} spinnerName="circle" />
         </div>
-        <div style={{color:'gray'}}>
+        <div style={{ color: 'gray' }}>
           <br />
           <h3>
-          <div>Controleer als de Marantz versterker aan staat.</div>
+            <div>Controleer als de Marantz versterker aan staat.</div>
           </h3>
         </div>
       </div>
@@ -199,7 +212,7 @@ class App extends Component {
 
     let mainSource = this.Source[this.state.SRC];
     let subSource = this.Source[this.state.MSC];
-  
+
     return (
 
       <div style={{ width: '100%' }} className="Main">
@@ -217,21 +230,24 @@ class App extends Component {
           <div style={{ marginLeft: 15 }}>
             <RaisedButton label="SONOS" primary={this.areSources("SONOS")} fullWidth={true} onTouchTap={this.onSONOS.bind(this)} />
           </div>
+          <div style={{ marginLeft: 15 }}>
+            <RaisedButton label="APPLE-MUSIC" primary={this.areSources("APPLE-MUSIC")} fullWidth={true} onTouchTap={this.onDSS.bind(this)} />
+          </div>
         </List>
         <div>
           <Subheader>Volume woonkamer</Subheader>
           <div style={{ marginLeft: 15, marginBottom: 15, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-            <RaisedButton style={{flexGrow:1}} label="-" primary={false} onTouchTap={this.onMainVolume.bind(this, -1)} />
-            <RaisedButton style={{flexGrow:1}} label={this.state.MainVolume} primary={false} />
-            <RaisedButton style={{flexGrow:1}} label="+" primary={false}  onTouchTap={this.onMainVolume.bind(this, 1)} />
+            <RaisedButton style={{ flexGrow: 1 }} label="-" primary={false} onTouchTap={this.onMainVolume.bind(this, -1)} />
+            <RaisedButton style={{ flexGrow: 1 }} label={this.state.MainVolume} primary={false} />
+            <RaisedButton style={{ flexGrow: 1 }} label="+" primary={false} onTouchTap={this.onMainVolume.bind(this, 1)} />
             {/*<Slider step={1} value={this.state.MainVolume} min={-65} max={-10} onChange={this.volumeChange.bind(this)} />*/}
           </div>
           <Subheader>Volume keuken</Subheader>
           <div style={{ marginLeft: 15, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-            <RaisedButton style={{flexGrow:1}}  label="-" primary={false} onTouchTap={this.onRoomVolume.bind(this, -1)} />
-            <RaisedButton style={{flexGrow:1}}  label={this.state.RoomVolume} primary={false} />
-            <RaisedButton style={{flexGrow:1}}  label="+" primary={false}  onTouchTap={this.onRoomVolume.bind(this, 1)} />  
-               {/*<Slider step={1} value={this.state.RoomVolume} min={-90} max={-60} onChange={this.RoomVolumeChange.bind(this)} />*/}
+            <RaisedButton style={{ flexGrow: 1 }} label="-" primary={false} onTouchTap={this.onRoomVolume.bind(this, -1)} />
+            <RaisedButton style={{ flexGrow: 1 }} label={this.state.RoomVolume} primary={false} />
+            <RaisedButton style={{ flexGrow: 1 }} label="+" primary={false} onTouchTap={this.onRoomVolume.bind(this, 1)} />
+            {/*<Slider step={1} value={this.state.RoomVolume} min={-90} max={-60} onChange={this.RoomVolumeChange.bind(this)} />*/}
           </div>
         </div>
         <List>
@@ -239,7 +255,7 @@ class App extends Component {
           <ListItem primaryText="Woonkamer" rightToggle={<Toggle toggled={this.state.PWR} onToggle={this.PWR.bind(this)} />} />
           <ListItem primaryText="Keuken" rightToggle={<Toggle toggled={this.state.MSP} onToggle={this.MSP.bind(this)} />} />
         </List>
-          <Subheader>Bron woonkamer: {mainSource}, Bron keuken: {subSource}</Subheader>
+        <Subheader>Bron woonkamer: {mainSource}, Bron keuken: {subSource}</Subheader>
 
       </div>
     );

@@ -1,0 +1,8 @@
+{
+          "name": "Maranz WiFi-Remote",
+          "description": "This app helps you i controlling the Matantz",
+          "icons": [{
+            "src": "favicon.ico",
+            "sizes": "64x64"
+          }]
+        }
