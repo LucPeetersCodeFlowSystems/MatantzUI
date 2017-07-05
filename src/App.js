@@ -24,7 +24,7 @@ injectTapEventPlugin();
 
 class App extends Component {
 
-  Source = { "1": "TV", "11": "TV", "2": "DVD", "D": "SONOS", "1D": "SONOS", "5G": "FM RADIO", "G": "FM RADIO", "55": "APPLE-MUSIC" };
+  Source = { "1": "TV", "11": "TV", "2": "DVD", "D": "SONOS", "1D": "SONOS", "5G": "FM RADIO", "G": "FM RADIO", "55": "AIRPLAY" };
   timer = null;
 
   constructor(props) {
@@ -231,7 +231,7 @@ class App extends Component {
             <RaisedButton label="SONOS" primary={this.areSources("SONOS")} fullWidth={true} onTouchTap={this.onSONOS.bind(this)} />
           </div>
           <div style={{ marginLeft: 15 }}>
-            <RaisedButton label="APPLE-MUSIC" primary={this.areSources("APPLE-MUSIC")} fullWidth={true} onTouchTap={this.onDSS.bind(this)} />
+            <RaisedButton label="AIRPLAY" primary={this.areSources("AIRPLAY")} fullWidth={true} onTouchTap={this.onDSS.bind(this)} />
           </div>
         </List>
         <div>
