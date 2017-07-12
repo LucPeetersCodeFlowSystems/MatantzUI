@@ -24,7 +24,7 @@ injectTapEventPlugin();
 
 class App extends Component {
 
-  Source = { "1": "TV", "11": "TV", "2": "DVD", "D": "SONOS", "1D": "SONOS", "5G": "FM RADIO", "G": "FM RADIO", "55": "AIRPLAY" };
+  Source = { "1": "TV", "11": "TV", "2": "DVD", "D": "SONOS", "1D": "SONOS", "5G": "FM RADIO", "G":"FM RADIO", "1G": "FM RADIO", "55": "AIRPLAY" };
   timer = null;
 
   constructor(props) {
